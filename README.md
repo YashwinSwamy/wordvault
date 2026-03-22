@@ -169,11 +169,13 @@ words
 
 ## Roadmap
 
+- [ ] Google SSO — sign in with Google account
 - [ ] Email invites for shared collections
 - [ ] Search and filter words
 - [ ] Edit word notes
 - [ ] Mobile responsive design
 - [ ] Landing page for new visitors
+- [ ] Android app (React Native)
 - [ ] Custom domain
 
 ---
