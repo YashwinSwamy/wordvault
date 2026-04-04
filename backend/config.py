@@ -12,6 +12,8 @@ class Config:
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "change-this-in-production")
     SECRET_KEY     = os.getenv("SECRET_KEY")
 
-    GOOGLE_CLIENT_ID     = os.getenv("GOOGLE_CLIENT_ID")
-    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+    GOOGLE_CLIENT_ID        = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET    = os.getenv("GOOGLE_CLIENT_SECRET")
+    SESSION_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_SECURE   = True
  
