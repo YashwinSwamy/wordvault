@@ -114,10 +114,13 @@ def me():
 @auth_bp.route("/google")
 def google_login():
     """Initiates the Google OAuth flow by redirecting the user to Google's authentication page."""
-    redirect_uri = url_for("auth.google_callback", _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
- 
- 
+    try:
+        redirect_uri = url_for("auth.google_callback", _external=True)
+        return oauth.google.authorize_redirect(redirect_uri)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 # ── Google Callback ───────────────────────────────────────────────────────────
 @auth_bp.route("/google/callback")
 def google_callback():
