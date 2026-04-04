@@ -25,7 +25,19 @@ def create_app():
     with app.app_context():
         db.create_all()
 
+
+    # health check — keeps Render awake + Supabase active
+    @app.route("/health")
+    def health():
+        try:
+            from models import User
+            User.query.first()
+            return {"status": "ok", "db": "connected"}, 200
+        except Exception as e:
+            return {"status": "error", "db": str(e)}, 500
+    
     return app
+
 
 app = create_app()
 
