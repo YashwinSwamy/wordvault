@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { register } from "../api";
 
+const BACKEND_URL = "https://wordvault-backend-xl0w.onrender.com";
+
 export default function Register() {
   const navigate = useNavigate();
   const [form, setForm]       = useState({ email: "", password: "", username: "" });
@@ -64,6 +66,20 @@ export default function Register() {
             {loading ? "Creating account..." : "Register"}
           </button>
         </form>
+
+
+        {/* Divider */}
+        <div style={styles.divider}>
+          <div style={styles.dividerLine}/>
+          <span style={styles.dividerText}>or</span>
+          <div style={styles.dividerLine}/>
+        </div>
+ 
+        {/* Google Button */}
+        <a href={`${BACKEND_URL}/api/auth/google`} style={styles.googleBtn}>
+          <img src="https://www.google.com/favicon.ico" width={16} height={16} alt="Google"/>
+          Continue with Google
+        </a>
 
         <p style={styles.link}>
           Already have an account? <Link to="/login">Login</Link>
@@ -131,6 +147,36 @@ const styles = {
     color: "#e07070",
     fontSize: 12,
     margin: 0,
+  },
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    margin: "20px 0 12px 0",
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    background: "#2e2e30",
+  },
+  dividerText: {
+    color: "#4a4640",
+    fontSize: 12,
+  },
+  googleBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    background: "#0e0e0f",
+    border: "1px solid #2e2e30",
+    borderRadius: 6,
+    color: "#f0ece3",
+    fontSize: 14,
+    padding: "10px",
+    cursor: "pointer",
+    textDecoration: "none",
+    marginBottom: 4,
   },
   link: {
     color: "#8a8070",
