@@ -166,4 +166,5 @@ def google_callback():
         return redirect(f"{frontend_url}/auth/callback?token={jwt_token}&user={user.id}&username={user.username}&email={user.email}")
  
     except Exception as e:
-        return redirect(f"{frontend_url}/login?error=google_failed")
+        # return redirect(f"{frontend_url}/login?error=google_failed")
+        return jsonify({"error": str(e)}), 500
