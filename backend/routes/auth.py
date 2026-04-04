@@ -1,26 +1,28 @@
 """Authentication routes for handling user registration and login."""
 
-from flask import Blueprint, request, jsonify, redirect, url_for
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from extensions import db, bcrypt
-from models import User, Collection
-from authlib.integrations.flask_client import OAuth
 import os
+
+from flask              import Blueprint, request, jsonify, redirect, url_for
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from extensions         import db, bcrypt
+from models             import User, Collection
+# from authlib.integrations.flask_client import OAuth
+
 
 auth_bp = Blueprint("auth", __name__)
 
 # ── Google OAuth setup ────────────────────────────────────────────────────────
-oauth = OAuth()
+# oauth = OAuth()
  
-def init_oauth(app):
-    oauth.init_app(app)
-    oauth.register(
-        name="google",
-        client_id=os.getenv("GOOGLE_CLIENT_ID"),
-        client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-        client_kwargs={"scope": "openid email profile"},
-    )
+# def init_oauth(app):
+#     oauth.init_app(app)
+#     oauth.register(
+#         name="google",
+#         client_id=os.getenv("GOOGLE_CLIENT_ID"),
+#         client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+#         server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+#         client_kwargs={"scope": "openid email profile"},
+#     )
 
 
 # ── Register ──────────────────────────────────────────────────────────────────
@@ -115,6 +117,7 @@ def me():
 def google_login():
     """Initiates the Google OAuth flow by redirecting the user to Google's authentication page."""
     try:
+        from app import oauth
         redirect_uri = url_for("auth.google_callback", _external=True)
         return oauth.google.authorize_redirect(redirect_uri)
     except Exception as e:
@@ -128,6 +131,7 @@ def google_callback():
     frontend_url = os.getenv("FRONTEND_URL", "https://wordvault-eight.vercel.app")
  
     try:
+        from app import oauth
         token = oauth.google.authorize_access_token()
         user_info = token.get("userinfo")
  
