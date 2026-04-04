@@ -1,11 +1,27 @@
 """Authentication routes for handling user registration and login."""
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, redirect, url_for
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from extensions import db, bcrypt
 from models import User, Collection
+from authlib.integrations.flask_client import OAuth
+import os
 
 auth_bp = Blueprint("auth", __name__)
+
+# ── Google OAuth setup ────────────────────────────────────────────────────────
+oauth = OAuth()
+ 
+def init_oauth(app):
+    oauth.init_app(app)
+    oauth.register(
+        name="google",
+        client_id=os.getenv("GOOGLE_CLIENT_ID"),
+        client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={"scope": "openid email profile"},
+    )
+
 
 # ── Register ──────────────────────────────────────────────────────────────────
 # POST /api/auth/register
@@ -92,3 +108,55 @@ def me():
             return jsonify({"error": "User not found"}), 404
         return jsonify({"user": user.to_dict()}), 200
     return inner()
+
+
+# ── Google Login ──────────────────────────────────────────────────────────────
+@auth_bp.route("/google")
+def google_login():
+    """Initiates the Google OAuth flow by redirecting the user to Google's authentication page."""
+    redirect_uri = url_for("auth.google_callback", _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+ 
+ 
+# ── Google Callback ───────────────────────────────────────────────────────────
+@auth_bp.route("/google/callback")
+def google_callback():
+    """Handles the callback from Google after user authentication."""
+    frontend_url = os.getenv("FRONTEND_URL", "https://wordvault-eight.vercel.app")
+ 
+    try:
+        token = oauth.google.authorize_access_token()
+        user_info = token.get("userinfo")
+ 
+        if not user_info:
+            return redirect(f"{frontend_url}/login?error=google_failed")
+ 
+        email    = user_info["email"]
+        name     = user_info.get("name", email.split("@")[0])
+        username = name.replace(" ", "").lower()
+ 
+        user = User.query.filter_by(email=email).first()
+ 
+        if not user:
+            user = User(
+                email         = email,
+                username      = username,
+                password_hash = None
+            )
+            db.session.add(user)
+            db.session.flush()
+ 
+            personal_collection = Collection(
+                name         = "Personal",
+                is_shared    = False,
+                owner_id     = user.id
+            )
+            db.session.add(personal_collection)
+            db.session.commit()
+ 
+        jwt_token = create_access_token(identity=str(user.id))
+ 
+        return redirect(f"{frontend_url}/auth/callback?token={jwt_token}&user={user.id}&username={user.username}&email={user.email}")
+ 
+    except Exception as e:
+        return redirect(f"{frontend_url}/login?error=google_failed")

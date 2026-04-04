@@ -13,7 +13,7 @@ def create_app():
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})  # tighten in production
 
     # register route blueprints
-    from routes.auth        import auth_bp
+    from routes.auth        import auth_bp, init_oauth
     from routes.words       import words_bp
     from routes.collections import collections_bp
 
