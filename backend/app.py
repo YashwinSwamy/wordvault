@@ -28,7 +28,7 @@ def create_app():
     )
 
     # register route blueprints
-    from routes.auth        import auth_bp, init_oauth
+    from routes.auth        import auth_bp
     from routes.words       import words_bp
     from routes.collections import collections_bp
 
