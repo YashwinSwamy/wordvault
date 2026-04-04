@@ -18,7 +18,7 @@ class User(db.Model):
 
     id            = db.Column(db.Integer, primary_key=True)
     email         = db.Column(db.String(255), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=True) # nullable for OAuth users
     username      = db.Column(db.String(100), nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
