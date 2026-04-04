@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login      from "./pages/Login";
 import Register   from "./pages/Register";
 import Dashboard  from "./pages/Dashboard";
+import AuthCallback from "./pages/AuthCallback";
 
 // ProtectedRoute — redirects to /login if no token found
 function ProtectedRoute({ children }) {
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/"         element={<Navigate to="/dashboard" />} />
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
