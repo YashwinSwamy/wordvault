@@ -58,8 +58,8 @@ def register():
         verify_link = f"{FRONTEND_URL}/api/auth/verify-email?token={verify_token}"
         verify_link = f"https://wordvault-backend-xl0w.onrender.com/api/auth/verify-email?token={verify_token}"
         send_verify_email(user.email, verify_link)
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"send verification Email error: {str(e)}", flush=True)
 
     token = create_access_token(identity=str(user.id))
 
@@ -155,6 +155,7 @@ def resend_verify():
         verify_link = f"https://wordvault-backend-xl0w.onrender.com/api/auth/verify-email?token={verify_token}"
         send_verify_email(user.email, verify_link)
     except Exception as e:
+        print(f"resend verification Email error: {str(e)}", flush=True)
         return jsonify({"error": "Could not send email. Please try again later."}), 500
 
     return jsonify({"message": "Verification email sent"}), 200
@@ -188,7 +189,8 @@ def forgot_password():
     try:
         reset_link = f"{FRONTEND_URL}/reset-password?token={reset_token}"
         send_reset_email(user.email, reset_link)
-    except Exception:
+    except Exception as e:
+        print(f"send reset Email error: {str(e)}", flush=True)
         pass
 
     return jsonify(generic), 200
