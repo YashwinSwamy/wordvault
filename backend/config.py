@@ -17,9 +17,9 @@ class Config:
     SESSION_COOKIE_SAMESITE = "None"
     SESSION_COOKIE_SECURE   = True
 
-    # Gmail SMTP for transactional email
-    GMAIL_USER         = os.getenv("GMAIL_USER", "")
-    GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
+    # Resend for transactional email
+    RESEND_API_KEY   = os.getenv("RESEND_API_KEY", "")
+    RESEND_FROM      = os.getenv("RESEND_FROM", "onboarding@resend.dev")
 
     # CORS — restrict to known frontend origins
     # Override via CORS_ORIGINS env var (comma-separated) on Render

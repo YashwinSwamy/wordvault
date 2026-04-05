@@ -1,28 +1,20 @@
-"""Shared email sending utility using Gmail SMTP."""
+"""Shared email sending utility using Resend."""
 
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text      import MIMEText
-from flask                import current_app
+import resend
+from flask import current_app
 
 FRONTEND_URL = "https://wordvault-eight.vercel.app"
 
 
 def _send(to_email, subject, html_body):
-    """Send an HTML email via Gmail SMTP."""
-    user     = current_app.config["GMAIL_USER"]
-    password = current_app.config["GMAIL_APP_PASSWORD"]
-
-    msg            = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = f"WordVault <{user}>"
-    msg["To"]      = to_email
-    msg.attach(MIMEText(html_body, "html"))
-
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.starttls()
-        server.login(user, password)
-        server.sendmail(user, to_email, msg.as_string())
+    """Send an HTML email via Resend."""
+    resend.api_key = current_app.config["RESEND_API_KEY"]
+    resend.Emails.send({
+        "from"   : current_app.config["RESEND_FROM"],
+        "to"     : [to_email],
+        "subject": subject,
+        "html"   : html_body,
+    })
 
 
 def send_verify_email(to_email, verify_link):
