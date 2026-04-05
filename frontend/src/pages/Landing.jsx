@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 // const BACKEND_URL = "https://wordvault-backend-xl0w.onrender.com";
@@ -21,19 +21,29 @@ const features = [
     desc: "Type any word and instantly get its definition, part of speech, and an example sentence — no dictionary tab needed.",
   },
   {
-    icon: "📝",
-    title: "Personal Notes",
-    desc: "Remember where you first encountered a word. Add context, quotes, or anything that helps it stick.",
+    icon: "✎",
+    title: "Inline Editing",
+    desc: "Edit your personal notes directly in the word table. Click any note to update it without leaving the page.",
+  },
+  {
+    icon: "🃏",
+    title: "Flashcard Mode",
+    desc: "Flip through your words as 3D flashcards. Perfect for reviewing and memorising your collection.",
   },
   {
     icon: "📚",
-    title: "Collections",
-    desc: "Organise words into themed collections. Collaborate with friends on shared lists in real time.",
+    title: "Collections & Sharing",
+    desc: "Organise words into themed collections. Invite collaborators or share a public read-only link.",
   },
   {
     icon: "📊",
-    title: "Export to Excel",
-    desc: "Download your entire vocabulary as a spreadsheet — great for studying, sharing, or archiving.",
+    title: "Export & Import",
+    desc: "Download your vocabulary as an Excel file or import from a spreadsheet — great for bulk adding words.",
+  },
+  {
+    icon: "📝",
+    title: "Personal Notes",
+    desc: "Remember where you first encountered a word. Add context, quotes, or anything that helps it stick.",
   },
 ];
 
@@ -42,7 +52,6 @@ const steps = [
   { n: "2", title: "Get the definition", desc: "WordVault fetches the definition, part of speech, and example instantly." },
   { n: "3", title: "Build your lexicon", desc: "Grow and share your vocabulary over time." },
 ];
-
 
 const CtaButtons = () => (
   <div style={s.ctaRow}>
@@ -59,6 +68,7 @@ const CtaButtons = () => (
 export default function Landing() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+  const revealRef = useRef(null);
 
   useEffect(() => {
     const handler = () => setIsMobile(window.innerWidth < 640);
@@ -66,8 +76,26 @@ export default function Landing() {
     return () => window.removeEventListener("resize", handler);
   }, []);
 
+  // Scroll reveal via IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    const els = document.querySelectorAll(".wv-reveal");
+    els.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div style={s.page}>
+    <div style={s.page} ref={revealRef}>
 
       {/* ── Navbar ── */}
       <nav style={s.nav}>
@@ -115,10 +143,10 @@ export default function Landing() {
         </h2>
         <div style={{
           ...s.featureGrid,
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(220px, 1fr))",
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(200px, 1fr))",
         }}>
           {features.map(f => (
-            <div key={f.title} style={s.featureCard}>
+            <div key={f.title} className="wv-reveal" style={s.featureCard}>
               <span style={s.featureIcon}>{f.icon}</span>
               <h3 style={s.featureTitle}>{f.title}</h3>
               <p style={s.featureDesc}>{f.desc}</p>
@@ -135,7 +163,7 @@ export default function Landing() {
           </h2>
           <div style={{ ...s.steps, flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "center" : "flex-start" }}>
             {steps.map((step, i) => (
-              <div key={step.n} style={{ ...s.stepWrap, flexDirection: isMobile ? "column" : "row" }}>
+              <div key={step.n} className="wv-reveal" style={{ ...s.stepWrap, flexDirection: isMobile ? "column" : "row" }}>
                 <div style={s.step}>
                   <div style={s.stepNum}>{step.n}</div>
                   <h3 style={s.stepTitle}>{step.title}</h3>
@@ -151,7 +179,7 @@ export default function Landing() {
       </section>
 
       {/* ── CTA Banner ── */}
-      <section style={{ ...s.ctaBanner, padding: isMobile ? "56px 6%" : "80px 6%" }}>
+      <section className="wv-reveal" style={{ ...s.ctaBanner, padding: isMobile ? "56px 6%" : "80px 6%" }}>
         <h2 style={{ ...s.ctaBannerTitle, fontSize: isMobile ? 22 : "clamp(24px, 4vw, 34px)" }}>
           Start building your lexicon today
         </h2>

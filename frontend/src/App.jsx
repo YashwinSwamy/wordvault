@@ -1,12 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import Landing        from "./pages/Landing";
-import Login          from "./pages/Login";
-import Register       from "./pages/Register";
-import Dashboard      from "./pages/Dashboard";
-import AuthCallback   from "./pages/AuthCallback";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword  from "./pages/ResetPassword";
+import Landing          from "./pages/Landing";
+import Login            from "./pages/Login";
+import Register         from "./pages/Register";
+import Dashboard        from "./pages/Dashboard";
+import AuthCallback     from "./pages/AuthCallback";
+import ForgotPassword   from "./pages/ForgotPassword";
+import ResetPassword    from "./pages/ResetPassword";
+import Settings         from "./pages/Settings";
+import SharedCollection from "./pages/SharedCollection";
 
 // Redirects logged-in users to /dashboard, otherwise shows the landing page
 function HomeRoute() {
@@ -35,6 +37,12 @@ export default function App() {
             <Dashboard />
           </ProtectedRoute>
         } />
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        } />
+        <Route path="/c/:token" element={<SharedCollection />} />
       </Routes>
       <SpeedInsights />
     </BrowserRouter>

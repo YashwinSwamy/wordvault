@@ -1,10 +1,16 @@
 """ Collection routes for managing collections and memberships."""
 
-from flask import Blueprint, request, jsonify
+import os
+import secrets
+
+from datetime           import datetime, timedelta
+from flask              import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from extensions import db
-from models import Collection, CollectionMember, User
-from email_service import send_invite_email
+from extensions         import db
+from models             import Collection, CollectionMember, User, Invitation
+from email_service      import send_invite_email, send_pending_invite_email
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://wordvault-eight.vercel.app")
 
 collections_bp = Blueprint("collections", __name__)
 
@@ -88,10 +94,31 @@ def invite_member(collection_id):
     if not collection.is_shared:
         return jsonify({"error": "This is a personal collection — convert it to shared first"}), 400
 
+    inviter = User.query.get(user_id)
+    inviter_name = inviter.username if inviter else "Someone"
+
     # find the user to invite
     invitee = User.query.filter_by(email=data["email"]).first()
+
     if not invitee:
-        return jsonify({"error": "No user found with that email"}), 404
+        # user not registered yet — create a pending invitation
+        token      = secrets.token_urlsafe(32)
+        invitation = Invitation(
+            email         = data["email"],
+            collection_id = collection_id,
+            token         = token,
+            expires_at    = datetime.utcnow() + timedelta(days=7),
+        )
+        db.session.add(invitation)
+        db.session.commit()
+
+        try:
+            register_link = f"{FRONTEND_URL}/register?invite={token}"
+            send_pending_invite_email(data["email"], collection.name, inviter_name, register_link)
+        except Exception:
+            pass
+
+        return jsonify({"message": "Invitation sent — they'll be added when they register"}), 201
 
     # don't invite the owner themselves
     if str(invitee.id) == str(user_id):
@@ -113,11 +140,10 @@ def invite_member(collection_id):
     db.session.add(member)
     db.session.commit()
 
-    inviter = User.query.get(user_id)
     try:
-        send_invite_email(invitee.email, collection.name, inviter.username if inviter else "Someone")
+        send_invite_email(invitee.email, collection.name, inviter_name)
     except Exception:
-        pass  # email failure should not block the invite
+        pass
 
     return jsonify({"message": f"{invitee.username} added to {collection.name}"}), 201
 
