@@ -22,6 +22,14 @@ class User(db.Model):
     username      = db.Column(db.String(100), nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # email verification
+    is_verified  = db.Column(db.Boolean, default=False, nullable=False)
+    verify_token = db.Column(db.String(100), nullable=True)
+
+    # password reset
+    reset_token         = db.Column(db.String(100), nullable=True)
+    reset_token_expires = db.Column(db.DateTime, nullable=True)
+
     # relationships
     words              = db.relationship("Word", backref="owner", lazy=True)
     owned_collections  = db.relationship("Collection", backref="owner", lazy=True)
@@ -29,7 +37,12 @@ class User(db.Model):
 
     def to_dict(self):
         """Convert the User object into a dictionary for easy JSON serialization."""
-        return {"id": self.id, "email": self.email, "username": self.username}
+        return {
+            "id"          : self.id,
+            "email"       : self.email,
+            "username"    : self.username,
+            "is_verified" : self.is_verified,
+        }
 
 
 # ── Collection ────────────────────────────────────────────────────────────────
