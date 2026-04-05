@@ -19,7 +19,7 @@ export default function Dashboard() {
   const [inviteColId,     setInviteColId]     = useState(null);
   const [message,         setMessage]         = useState("");
   const [isMobile,        setIsMobile]        = useState(window.innerWidth < 768);
-  const [sidebarOpen,     setSidebarOpen]     = useState(false);
+  const [sidebarOpen,     setSidebarOpen]     = useState(window.innerWidth >= 768);
 
   // ── On load ──────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -142,11 +142,17 @@ export default function Dashboard() {
 
   // ── Computed responsive styles ────────────────────────────────────────────────
   const sidebarStyle = isMobile
+    // Mobile: fixed overlay, slides in/out
     ? { ...styles.sidebar, position: "fixed", top: 0, left: 0, height: "100vh",
         zIndex: 200, width: 260,
         transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
         transition: "transform 0.2s ease" }
-    : styles.sidebar;
+    // Desktop: in-flow, shrinks to 0 when collapsed
+    : { ...styles.sidebar,
+        width: sidebarOpen ? 220 : 0,
+        padding: sidebarOpen ? "24px 16px" : 0,
+        overflow: "hidden",
+        transition: "width 0.2s ease, padding 0.2s ease" };
 
   const mainStyle    = isMobile ? { ...styles.main, padding: "20px 16px" } : styles.main;
   const addFormStyle = isMobile ? { ...styles.addForm, flexDirection: "column" } : styles.addForm;
@@ -159,9 +165,7 @@ export default function Dashboard() {
       {/* Navbar */}
       <div style={styles.navbar}>
         <div style={{ display: "flex", alignItems: "center" }}>
-          {isMobile && (
-            <button style={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>☰</button>
-          )}
+          <button style={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>☰</button>
           <span style={styles.logo}>WordVault</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
