@@ -53,6 +53,29 @@ def send_reset_email(to_email, reset_link):
     _send(to_email, "Reset your WordVault password", html)
 
 
+def send_pending_invite_email(to_email, collection_name, inviter_username, register_link):
+    html = f"""
+    <div style="font-family:Georgia,serif;max-width:480px;margin:0 auto;background:#1a1a1c;padding:40px;border-radius:12px;color:#f0ece3;">
+      <h1 style="color:#c9a96e;margin:0 0 8px;">WordVault</h1>
+      <p style="color:#8a8070;margin:0 0 28px;">You've been invited to a collection</p>
+      <p style="line-height:1.6;">
+        <strong>{inviter_username}</strong> has invited you to join the
+        <strong>&ldquo;{collection_name}&rdquo;</strong> collection on WordVault —
+        a collaborative vocabulary tracker.
+      </p>
+      <p style="line-height:1.6;">Create your free account to accept the invitation and start exploring the collection.</p>
+      <a href="{register_link}"
+         style="display:inline-block;background:#c9a96e;color:#0e0e0f;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;margin:20px 0;">
+        Accept Invitation
+      </a>
+      <p style="color:#4a4640;font-size:12px;margin-top:28px;">
+        This invitation expires in 7 days. If you don't want to join, you can safely ignore this email.
+      </p>
+    </div>
+    """
+    _send(to_email, f"{inviter_username} invited you to \"{collection_name}\" on WordVault", html)
+
+
 def send_invite_email(to_email, collection_name, inviter_username):
     login_url = f"{FRONTEND_URL}/login"
     html = f"""

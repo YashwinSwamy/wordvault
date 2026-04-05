@@ -12,10 +12,12 @@ oauth = OAuth()
 def _migrate_columns(app):
     """Add new columns to existing tables without dropping data (PostgreSQL only)."""
     statements = [
-        "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified    BOOLEAN   NOT NULL DEFAULT FALSE",
-        "ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_token   VARCHAR(100)",
-        "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token    VARCHAR(100)",
-        "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP",
+        "ALTER TABLE users       ADD COLUMN IF NOT EXISTS is_verified         BOOLEAN NOT NULL DEFAULT FALSE",
+        "ALTER TABLE users       ADD COLUMN IF NOT EXISTS verify_token        VARCHAR(100)",
+        "ALTER TABLE users       ADD COLUMN IF NOT EXISTS reset_token         VARCHAR(100)",
+        "ALTER TABLE users       ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP",
+        "ALTER TABLE collections ADD COLUMN IF NOT EXISTS share_token         VARCHAR(100)",
+        "ALTER TABLE collections ADD COLUMN IF NOT EXISTS share_expires_at    TIMESTAMP",
     ]
     with app.app_context():
         with db.engine.connect() as conn:
@@ -48,11 +50,14 @@ def create_app():
     from routes.auth        import auth_bp
     from routes.words       import words_bp
     from routes.collections import collections_bp
+    from routes.share       import share_bp
+    from routes.settings    import settings_bp
 
-    # init_oauth(app)
     app.register_blueprint(auth_bp,        url_prefix="/api/auth")
     app.register_blueprint(words_bp,       url_prefix="/api/words")
     app.register_blueprint(collections_bp, url_prefix="/api/collections")
+    app.register_blueprint(share_bp,       url_prefix="/api/share")
+    app.register_blueprint(settings_bp,    url_prefix="/api/settings")
 
     # create tables if they don't exist yet, then add any new columns
     with app.app_context():

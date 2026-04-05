@@ -4,9 +4,36 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>WordVault</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; background: #0e0e0f; }
+
+      @keyframes wv-fadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes wv-slideIn {
+        from { opacity: 0; transform: translateX(-16px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+
+      .wv-reveal {
+        opacity: 0;
+        transform: translateY(24px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .wv-reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .wv-hover-lift:hover {
+        transform: translateY(-3px);
+        transition: transform 0.2s ease;
+      }
+    </style>
   </head>
-  <body>
+  <body style="margin:0;padding:0;background:#0e0e0f;">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

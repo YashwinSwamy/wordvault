@@ -1,8 +1,9 @@
 """
-Defines the database models for the WordVault application, 
-    including User, 
-              Collection, 
-              CollectionMember, and 
+Defines the database models for the WordVault application,
+    including User,
+              Collection,
+              CollectionMember,
+              Invitation, and
               Word.
 """
 
@@ -11,7 +12,7 @@ from extensions import db
 
 # ── User ──────────────────────────────────────────────────────────────────────
 class User(db.Model):
-    """Represents a user of the application. 
+    """Represents a user of the application.
        Each user has a unique email and a default personal collection.
     """
     __tablename__ = "users"
@@ -46,19 +47,21 @@ class User(db.Model):
 
 
 # ── Collection ────────────────────────────────────────────────────────────────
-# A collection is a group of words. Every user gets a default "Personal" collection.
-# They can also create shared collections and invite others.
 class Collection(db.Model):
-    """Represents a collection of words. 
+    """Represents a collection of words.
        Can be personal (is_shared=False) or shared (is_shared=True).
     """
     __tablename__ = "collections"
 
     id         = db.Column(db.Integer, primary_key=True)
     name       = db.Column(db.String(255), nullable=False)
-    is_shared  = db.Column(db.Boolean, default=False)   # False = personal, True = collaborative
+    is_shared  = db.Column(db.Boolean, default=False)
     owner_id   = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # share link
+    share_token      = db.Column(db.String(100), nullable=True, unique=True)
+    share_expires_at = db.Column(db.DateTime,    nullable=True)
 
     # relationships
     words   = db.relationship("Word",             backref="collection", lazy=True)
@@ -67,17 +70,17 @@ class Collection(db.Model):
     def to_dict(self):
         """Convert the Collection object into a dictionary for easy JSON serialization."""
         return {
-            "id"         : self.id,
-            "name"       : self.name,
-            "is_shared"  : self.is_shared,
-            "owner_id"   : self.owner_id,
-            "created_at" : self.created_at.isoformat(),
+            "id"              : self.id,
+            "name"            : self.name,
+            "is_shared"       : self.is_shared,
+            "owner_id"        : self.owner_id,
+            "created_at"      : self.created_at.isoformat(),
+            "share_token"     : self.share_token,
+            "share_expires_at": self.share_expires_at.isoformat() if self.share_expires_at else None,
         }
 
 
 # ── CollectionMember ──────────────────────────────────────────────────────────
-# Tracks which users have access to a shared collection.
-# Role: "admin" (can invite others) or "member" (can only add words)
 class CollectionMember(db.Model):
     """Represents a user's membership in a shared collection, including their role (admin/member)."""
     __tablename__ = "collection_members"
@@ -87,6 +90,21 @@ class CollectionMember(db.Model):
     user_id       = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     role          = db.Column(db.String(50), default="member")  # "admin" or "member"
     joined_at     = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# ── Invitation ────────────────────────────────────────────────────────────────
+class Invitation(db.Model):
+    """Pending collection invitation for an unregistered email address.
+       On registration the new user is auto-joined and the invite deleted.
+    """
+    __tablename__ = "invitations"
+
+    id            = db.Column(db.Integer, primary_key=True)
+    email         = db.Column(db.String(255), nullable=False)
+    collection_id = db.Column(db.Integer, db.ForeignKey("collections.id"), nullable=False)
+    token         = db.Column(db.String(100), nullable=False, unique=True)
+    expires_at    = db.Column(db.DateTime, nullable=False)
+    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # ── Word ──────────────────────────────────────────────────────────────────────
@@ -99,7 +117,7 @@ class Word(db.Model):
     part_of_speech = db.Column(db.String(100))
     definition     = db.Column(db.Text)
     example        = db.Column(db.Text)
-    notes          = db.Column(db.Text)                          # user's personal note
+    notes          = db.Column(db.Text)
     added_by       = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     collection_id  = db.Column(db.Integer, db.ForeignKey("collections.id"), nullable=False)
     created_at     = db.Column(db.DateTime, default=datetime.utcnow)
@@ -117,4 +135,3 @@ class Word(db.Model):
             "collection_id"  : self.collection_id,
             "created_at"     : self.created_at.isoformat(),
         }
-    

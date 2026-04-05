@@ -7,7 +7,7 @@ from datetime           import datetime, timedelta
 from flask              import Blueprint, request, jsonify, redirect, url_for
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from extensions         import db, bcrypt
-from models             import User, Collection
+from models             import User, Collection, CollectionMember, Invitation
 from email_service      import send_verify_email, send_reset_email, send_invite_email
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://wordvault-eight.vercel.app")
@@ -52,6 +52,20 @@ def register():
     )
     db.session.add(personal_collection)
     db.session.commit()
+
+    # auto-join any pending invitations for this email
+    pending = Invitation.query.filter_by(email=data["email"]).filter(
+        Invitation.expires_at > datetime.utcnow()
+    ).all()
+    for inv in pending:
+        db.session.add(CollectionMember(
+            collection_id = inv.collection_id,
+            user_id       = user.id,
+            role          = "member"
+        ))
+        db.session.delete(inv)
+    if pending:
+        db.session.commit()
 
     # send verification email (non-blocking: failure doesn't abort registration)
     try:
