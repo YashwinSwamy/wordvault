@@ -16,4 +16,11 @@ class Config:
     GOOGLE_CLIENT_SECRET    = os.getenv("GOOGLE_CLIENT_SECRET")
     SESSION_COOKIE_SAMESITE = "None"
     SESSION_COOKIE_SECURE   = True
+
+    # CORS — restrict to known frontend origins
+    # Override via CORS_ORIGINS env var (comma-separated) on Render
+    CORS_ORIGINS = os.getenv(
+        "CORS_ORIGINS",
+        "https://wordvault-eight.vercel.app,http://localhost:5173"
+    ).split(",")
  
