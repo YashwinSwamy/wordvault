@@ -4,6 +4,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from extensions import db
 from models import Collection, CollectionMember, User
+from email_service import send_invite_email
 
 collections_bp = Blueprint("collections", __name__)
 
@@ -111,6 +112,12 @@ def invite_member(collection_id):
     )
     db.session.add(member)
     db.session.commit()
+
+    inviter = User.query.get(user_id)
+    try:
+        send_invite_email(invitee.email, collection.name, inviter.username if inviter else "Someone")
+    except Exception:
+        pass  # email failure should not block the invite
 
     return jsonify({"message": f"{invitee.username} added to {collection.name}"}), 201
 

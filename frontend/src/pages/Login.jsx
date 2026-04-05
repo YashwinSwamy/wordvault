@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { login } from "../api";
 
 const BACKEND_URL = "https://wordvault-backend-xl0w.onrender.com";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const verified    = searchParams.get("verified") === "1";
+  const resetDone   = searchParams.get("reset")    === "1";
   const [form, setForm]       = useState({ email: "", password: "" });
   const [error, setError]     = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,6 +36,9 @@ export default function Login() {
         <h1 style={styles.title}>WordVault</h1>
         <p style={styles.subtitle}>Welcome back</p>
 
+        {verified  && <p style={styles.success}>Email verified! You can now log in.</p>}
+        {resetDone && <p style={styles.success}>Password updated! Log in with your new password.</p>}
+
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
             style={styles.input}
@@ -52,6 +58,9 @@ export default function Login() {
             onChange={handleChange}
             required
           />
+          <div style={{ textAlign: "right", marginTop: -4 }}>
+            <Link to="/forgot-password" style={styles.forgotLink}>Forgot password?</Link>
+          </div>
           {error && <p style={styles.error}>{error}</p>}
           <button style={styles.button} type="submit" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
@@ -173,5 +182,16 @@ const styles = {
     fontSize: 13,
     textAlign: "center",
     marginTop: 20,
+  },
+  forgotLink: {
+    color: "#8a8070",
+    fontSize: 12,
+    textDecoration: "none",
+  },
+  success: {
+    color: "#6ec97a",
+    fontSize: 12,
+    margin: "0 0 12px 0",
+    textAlign: "center",
   },
 };
