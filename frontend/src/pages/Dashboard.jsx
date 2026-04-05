@@ -18,6 +18,8 @@ export default function Dashboard() {
   const [inviteEmail,     setInviteEmail]     = useState("");
   const [inviteColId,     setInviteColId]     = useState(null);
   const [message,         setMessage]         = useState("");
+  const [isMobile,        setIsMobile]        = useState(window.innerWidth < 768);
+  const [sidebarOpen,     setSidebarOpen]     = useState(false);
 
   // ── On load ──────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -27,6 +29,12 @@ export default function Dashboard() {
   useEffect(() => {
     if (activeCollection) fetchWords();
   }, [activeCollection]);
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
 
   // ── Fetch collections ────────────────────────────────────────────────────────
   const fetchCollections = async () => {
@@ -132,13 +140,30 @@ export default function Dashboard() {
 
   const allCollections = [...(collections.owned || []), ...(collections.shared || [])];
 
+  // ── Computed responsive styles ────────────────────────────────────────────────
+  const sidebarStyle = isMobile
+    ? { ...styles.sidebar, position: "fixed", top: 0, left: 0, height: "100vh",
+        zIndex: 200, width: 260,
+        transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+        transition: "transform 0.2s ease" }
+    : styles.sidebar;
+
+  const mainStyle    = isMobile ? { ...styles.main, padding: "20px 16px" } : styles.main;
+  const addFormStyle = isMobile ? { ...styles.addForm, flexDirection: "column" } : styles.addForm;
+  const wordInputStyle = isMobile ? { ...styles.wordInput, width: "100%", boxSizing: "border-box" } : styles.wordInput;
+
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div style={styles.page}>
 
       {/* Navbar */}
       <div style={styles.navbar}>
-        <span style={styles.logo}>WordVault</span>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {isMobile && (
+            <button style={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>☰</button>
+          )}
+          <span style={styles.logo}>WordVault</span>
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <span style={styles.username}>Hi, {user.username}</span>
           <button style={styles.logoutBtn} onClick={handleLogout}>Logout</button>
@@ -147,8 +172,16 @@ export default function Dashboard() {
 
       <div style={styles.body}>
 
+        {/* Mobile backdrop */}
+        {isMobile && sidebarOpen && (
+          <div style={styles.sidebarBackdrop} onClick={() => setSidebarOpen(false)} />
+        )}
+
         {/* Sidebar */}
-        <div style={styles.sidebar}>
+        <div style={sidebarStyle}>
+          {isMobile && (
+            <button style={styles.sidebarClose} onClick={() => setSidebarOpen(false)}>✕</button>
+          )}
           <p style={styles.sidebarLabel}>My Collections</p>
           {allCollections.map(c => (
             <div
@@ -157,7 +190,7 @@ export default function Dashboard() {
                 ...styles.collectionItem,
                 ...(activeCollection?.id === c.id ? styles.collectionActive : {})
               }}
-              onClick={() => setActiveCollection(c)}
+              onClick={() => { setActiveCollection(c); if (isMobile) setSidebarOpen(false); }}
             >
               <span>{c.name}</span>
               {c.is_shared && <span style={styles.sharedBadge}>shared</span>}
@@ -204,7 +237,7 @@ export default function Dashboard() {
         </div>
 
         {/* Main content */}
-        <div style={styles.main}>
+        <div style={mainStyle}>
 
           {/* Header */}
           <div style={styles.mainHeader}>
@@ -215,9 +248,9 @@ export default function Dashboard() {
           </div>
 
           {/* Add word form */}
-          <div style={styles.addForm}>
+          <div style={addFormStyle}>
             <input
-              style={styles.wordInput}
+              style={wordInputStyle}
               placeholder="Enter a word..."
               value={word}
               onChange={e => setWord(e.target.value)}
@@ -225,7 +258,7 @@ export default function Dashboard() {
               disabled={loading}
             />
             <input
-              style={styles.notesInput}
+              style={{ ...styles.notesInput, ...(isMobile ? { width: "100%", boxSizing: "border-box" } : {}) }}
               placeholder="Notes (optional)..."
               value={notes}
               onChange={e => setNotes(e.target.value)}
@@ -241,10 +274,29 @@ export default function Dashboard() {
           {error   && <p style={styles.error}>{error}</p>}
           {message && <p style={styles.success}>{message}</p>}
 
-          {/* Words table */}
+          {/* Words list */}
           {words.length === 0 ? (
             <div style={styles.empty}>No words yet — add your first one above!</div>
+          ) : isMobile ? (
+            /* Mobile: card layout */
+            <div>
+              {words.map(w => (
+                <div key={w.id} style={styles.mobileCard}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={styles.mobileWord}>
+                        {w.word}
+                        {w.part_of_speech && <span style={{ ...styles.posBadge, marginLeft: 8 }}>{w.part_of_speech}</span>}
+                      </div>
+                      <div style={styles.mobileDef}>{w.definition}</div>
+                    </div>
+                    <button style={styles.mobileDeleteBtn} onClick={() => handleDelete(w.id)}>✕</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
+            /* Desktop: full table */
             <div style={styles.tableWrap}>
               <table style={styles.table}>
                 <thead>
@@ -288,8 +340,11 @@ const styles = {
   logo:       { fontFamily: "Georgia, serif", fontSize: 20, color: "#c9a96e", fontWeight: 700 },
   username:   { color: "#8a8070", fontSize: 14 },
   logoutBtn:  { background: "transparent", border: "1px solid #2e2e30", borderRadius: 6, color: "#8a8070", cursor: "pointer", fontSize: 12, padding: "6px 14px" },
+  hamburger:  { background: "transparent", border: "none", color: "#c9a96e", fontSize: 22, cursor: "pointer", padding: "0 12px 0 0", lineHeight: 1 },
   body:       { display: "flex", minHeight: "calc(100vh - 57px)" },
+  sidebarBackdrop: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 199 },
   sidebar:    { width: 220, borderRight: "1px solid #2e2e30", padding: "24px 16px", background: "#161617", flexShrink: 0 },
+  sidebarClose: { background: "transparent", border: "none", color: "#8a8070", fontSize: 18, cursor: "pointer", float: "right", padding: "0 4px 8px" },
   sidebarLabel: { fontFamily: "monospace", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#4a4640", marginBottom: 10 },
   collectionItem: { padding: "8px 12px", borderRadius: 6, cursor: "pointer", fontSize: 14, color: "#8a8070", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 },
   collectionActive: { background: "#2e2e30", color: "#f0ece3" },
@@ -315,4 +370,8 @@ const styles = {
   td:         { fontSize: 14, color: "#c8c2b5", padding: "14px 12px", verticalAlign: "top", lineHeight: 1.5 },
   posBadge:   { fontFamily: "monospace", fontSize: 9, letterSpacing: 1, textTransform: "uppercase", color: "#c9a96e", background: "rgba(201,169,110,0.1)", padding: "2px 7px", borderRadius: 99 },
   deleteBtn:  { background: "transparent", border: "none", color: "#3a3630", cursor: "pointer", fontSize: 14, padding: "2px 6px" },
+  mobileCard: { padding: "14px 0", borderBottom: "1px solid #1e1e20" },
+  mobileWord: { fontWeight: 600, fontSize: 15, color: "#f0ece3", marginBottom: 6, display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6 },
+  mobileDef:  { fontSize: 13, color: "#c8c2b5", lineHeight: 1.6 },
+  mobileDeleteBtn: { background: "transparent", border: "none", color: "#4a4640", cursor: "pointer", fontSize: 16, padding: "0 0 0 12px", flexShrink: 0 },
 };
