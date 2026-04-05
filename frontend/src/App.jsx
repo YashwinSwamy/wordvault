@@ -1,9 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import Login      from "./pages/Login";
-import Register   from "./pages/Register";
-import Dashboard  from "./pages/Dashboard";
-import AuthCallback from "./pages/AuthCallback";
+import Login          from "./pages/Login";
+import Register       from "./pages/Register";
+import Dashboard      from "./pages/Dashboard";
+import AuthCallback   from "./pages/AuthCallback";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword  from "./pages/ResetPassword";
 
 // ProtectedRoute — redirects to /login if no token found
 function ProtectedRoute({ children }) {
@@ -18,7 +20,9 @@ export default function App() {
         <Route path="/"         element={<Navigate to="/dashboard" />} />
         <Route path="/login"    element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/auth/callback"   element={<AuthCallback />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password"  element={<ResetPassword />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />

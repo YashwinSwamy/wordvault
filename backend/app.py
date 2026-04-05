@@ -1,11 +1,28 @@
 """"""
 
 from flask                             import Flask
+from sqlalchemy                        import text
 from config                            import Config
 from extensions                        import db, jwt, bcrypt, cors
 from authlib.integrations.flask_client import OAuth
 
 oauth = OAuth()
+
+
+def _migrate_columns(app):
+    """Add new columns to existing tables without dropping data (PostgreSQL only)."""
+    statements = [
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified    BOOLEAN   NOT NULL DEFAULT FALSE",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_token   VARCHAR(100)",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token    VARCHAR(100)",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP",
+    ]
+    with app.app_context():
+        with db.engine.connect() as conn:
+            for stmt in statements:
+                conn.execute(text(stmt))
+            conn.commit()
+
 
 def create_app():
     app = Flask(__name__)
@@ -37,9 +54,10 @@ def create_app():
     app.register_blueprint(words_bp,       url_prefix="/api/words")
     app.register_blueprint(collections_bp, url_prefix="/api/collections")
 
-    # create tables if they don't exist yet
+    # create tables if they don't exist yet, then add any new columns
     with app.app_context():
         db.create_all()
+        _migrate_columns(app)
 
 
     # health check — keeps Render awake + Supabase active

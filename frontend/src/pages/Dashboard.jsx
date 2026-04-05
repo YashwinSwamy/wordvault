@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { listWords, addWord, deleteWord, exportWords, listCollections, createCollection, inviteMember } from "../api";
+import { listWords, addWord, deleteWord, exportWords, listCollections, createCollection, inviteMember, resendVerify } from "../api";
 
 export default function Dashboard() {
   const navigate  = useNavigate();
@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [message,         setMessage]         = useState("");
   const [isMobile,        setIsMobile]        = useState(window.innerWidth < 768);
   const [sidebarOpen,     setSidebarOpen]     = useState(window.innerWidth >= 768);
+  const [verifyMsg,       setVerifyMsg]       = useState("");
 
   // ── On load ──────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -138,6 +139,15 @@ export default function Dashboard() {
     setTimeout(() => setMessage(""), 3000);
   };
 
+  const handleResendVerify = async () => {
+    try {
+      await resendVerify();
+      setVerifyMsg("Verification email sent — check your inbox.");
+    } catch {
+      setVerifyMsg("Could not send email. Try again later.");
+    }
+  };
+
   const allCollections = [...(collections.owned || []), ...(collections.shared || [])];
 
   // ── Computed responsive styles ────────────────────────────────────────────────
@@ -173,6 +183,15 @@ export default function Dashboard() {
           <button style={styles.logoutBtn} onClick={handleLogout}>Logout</button>
         </div>
       </div>
+
+      {/* Email verification banner */}
+      {!user.is_verified && (
+        <div style={styles.verifyBanner}>
+          <span>Please verify your email — check your inbox for a link.</span>
+          <button style={styles.verifyBtn} onClick={handleResendVerify}>Resend</button>
+          {verifyMsg && <span style={{ marginLeft: 12, fontSize: 12, color: "#6ec97a" }}>{verifyMsg}</span>}
+        </div>
+      )}
 
       <div style={styles.body}>
 
@@ -378,4 +397,6 @@ const styles = {
   mobileWord: { fontWeight: 600, fontSize: 15, color: "#f0ece3", marginBottom: 6, display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6 },
   mobileDef:  { fontSize: 13, color: "#c8c2b5", lineHeight: 1.6 },
   mobileDeleteBtn: { background: "transparent", border: "none", color: "#4a4640", cursor: "pointer", fontSize: 16, padding: "0 0 0 12px", flexShrink: 0 },
+  verifyBanner: { background: "rgba(201,169,110,0.1)", borderBottom: "1px solid rgba(201,169,110,0.2)", color: "#c9a96e", fontSize: 13, padding: "10px 32px", display: "flex", alignItems: "center", gap: 12 },
+  verifyBtn:    { background: "transparent", border: "1px solid #c9a96e", borderRadius: 4, color: "#c9a96e", cursor: "pointer", fontSize: 12, padding: "4px 12px" },
 };
