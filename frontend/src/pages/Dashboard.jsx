@@ -276,15 +276,11 @@ export default function Dashboard() {
           <button style={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>☰</button>
           <span style={styles.logo}>WordVault</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          {!isMobile && <span style={styles.username}>Hi, {user.username}</span>}
-          <Link to="/settings" style={styles.settingsLink}>Settings</Link>
-          <button style={styles.logoutBtn} onClick={handleLogout}>Logout</button>
-        </div>
+        {!isMobile && <span style={styles.username}>Hi, {user.username}</span>}
       </div>
 
       {/* Email verification banner */}
-      {!user.is_verified && (
+      {user.is_verified === false && (
         <div style={styles.verifyBanner}>
           <span>Please verify your email — check your inbox for a link.</span>
           <button style={styles.verifyBtn} onClick={handleResendVerify}>Resend</button>
@@ -375,6 +371,12 @@ export default function Dashboard() {
               )}
             </div>
           )}
+
+          {/* Bottom: Settings + Logout */}
+          <div style={styles.sidebarBottom}>
+            <Link to="/settings" style={styles.sidebarBottomLink}>Settings</Link>
+            <button style={styles.sidebarBottomBtn} onClick={handleLogout}>Logout</button>
+          </div>
         </div>
 
         {/* Main content */}
@@ -614,7 +616,10 @@ const styles = {
   hamburger:  { background: "transparent", border: "none", color: "#c9a96e", fontSize: 22, cursor: "pointer", padding: "0 12px 0 0", lineHeight: 1 },
   body:       { display: "flex", minHeight: "calc(100vh - 57px)" },
   sidebarBackdrop: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 199 },
-  sidebar:    { width: 220, borderRight: "1px solid #2e2e30", padding: "24px 16px", background: "#161617", flexShrink: 0 },
+  sidebar:    { width: 220, borderRight: "1px solid #2e2e30", padding: "24px 16px", background: "#161617", flexShrink: 0, display: "flex", flexDirection: "column" },
+  sidebarBottom: { marginTop: "auto", paddingTop: 16, borderTop: "1px solid #2e2e30", display: "flex", flexDirection: "column", gap: 6 },
+  sidebarBottomLink: { color: "#8a8070", fontSize: 13, textDecoration: "none", padding: "8px 12px", borderRadius: 6, display: "block" },
+  sidebarBottomBtn: { background: "transparent", border: "none", color: "#8a8070", cursor: "pointer", fontSize: 13, padding: "8px 12px", borderRadius: 6, textAlign: "left" },
   sidebarClose: { background: "transparent", border: "none", color: "#8a8070", fontSize: 18, cursor: "pointer", float: "right", padding: "0 4px 8px" },
   sidebarLabel: { fontFamily: "monospace", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#4a4640", marginBottom: 10, marginTop: 0 },
   collectionItem: { padding: "8px 12px", borderRadius: 6, cursor: "pointer", fontSize: 14, color: "#8a8070", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 },
