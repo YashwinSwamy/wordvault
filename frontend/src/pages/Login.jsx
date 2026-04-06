@@ -68,7 +68,6 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Google sign-in temporarily hidden
         <div style={styles.divider}>
           <div style={styles.dividerLine}/>
           <span style={styles.dividerText}>or</span>
@@ -78,7 +77,6 @@ export default function Login() {
           <img src="https://www.google.com/favicon.ico" width={16} height={16} alt="Google"/>
           Continue with Google
         </a>
-        */}
 
         <p style={styles.link}>
           Don't have an account? <Link to="/register">Register</Link>
