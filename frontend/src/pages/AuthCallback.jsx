@@ -6,11 +6,12 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const token    = params.get("token");
-    const user_id  = params.get("user");
-    const username = params.get("username");
-    const email    = params.get("email");
-    const error    = params.get("error");
+    const token      = params.get("token");
+    const user_id    = params.get("user");
+    const username   = params.get("username");
+    const email      = params.get("email");
+    const isVerified = params.get("is_verified");
+    const error      = params.get("error");
 
     if (error || !token) {
       navigate("/login?error=google_failed");
@@ -22,7 +23,8 @@ export default function AuthCallback() {
     localStorage.setItem("user", JSON.stringify({
       id: user_id,
       username,
-      email
+      email,
+      is_verified: isVerified === "true",
     }));
 
     navigate("/dashboard");
