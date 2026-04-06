@@ -2,7 +2,8 @@ import axios from "axios";
 
 const API = axios.create({
   // baseURL: "http://127.0.0.1:5000/api",
-  baseURL: "https://wordvault-backend-xl0w.onrender.com/api",
+  // baseURL: "https://wordvault-backend-xl0w.onrender.com/api",
+  baseURL: "https://api.wordvault.in/api",
 });
 
 // automatically attach JWT token to every request if it exists

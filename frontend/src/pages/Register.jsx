@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { register } from "../api";
 
-const BACKEND_URL = "https://wordvault-backend-xl0w.onrender.com";
+// const BACKEND_URL = "https://wordvault-backend-xl0w.onrender.com";
+const BACKEND_URL = "https://api.wordvault.in";
 
 export default function Register() {
   const navigate = useNavigate();
