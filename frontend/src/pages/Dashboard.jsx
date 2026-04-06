@@ -297,82 +297,90 @@ export default function Dashboard() {
 
         {/* Sidebar */}
         <div style={sidebarStyle}>
-          {isMobile && (
-            <button style={styles.sidebarClose} onClick={() => setSidebarOpen(false)}>✕</button>
-          )}
-          <p style={styles.sidebarLabel}>My Collections</p>
-          {allCollections.map(c => (
-            <div
-              key={c.id}
-              style={{
-                ...styles.collectionItem,
-                ...(activeCollection?.id === c.id ? styles.collectionActive : {})
-              }}
-              onClick={() => { setActiveCollection(c); if (isMobile) setSidebarOpen(false); }}
-            >
-              <span>{c.name}</span>
-              {c.is_shared && <span style={styles.sharedBadge}>shared</span>}
-            </div>
-          ))}
 
-          {/* Create collection */}
-          <div style={styles.newColForm}>
-            <input
-              style={styles.sidebarInput}
-              placeholder="New collection..."
-              value={newColName}
-              onChange={e => setNewColName(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleCreateCollection()}
-            />
-            <button style={styles.sidebarBtn} onClick={handleCreateCollection}>+</button>
+          {/* Mobile header row — ✕ button */}
+          {isMobile && (
+            <div style={styles.sidebarHeader}>
+              <button style={styles.sidebarClose} onClick={() => setSidebarOpen(false)}>✕</button>
+            </div>
+          )}
+
+          {/* Scrollable content */}
+          <div style={styles.sidebarScroll}>
+            <p style={styles.sidebarLabel}>My Collections</p>
+            {allCollections.map(c => (
+              <div
+                key={c.id}
+                style={{
+                  ...styles.collectionItem,
+                  ...(activeCollection?.id === c.id ? styles.collectionActive : {})
+                }}
+                onClick={() => { setActiveCollection(c); if (isMobile) setSidebarOpen(false); }}
+              >
+                <span>{c.name}</span>
+                {c.is_shared && <span style={styles.sharedBadge}>shared</span>}
+              </div>
+            ))}
+
+            {/* Create collection */}
+            <div style={styles.newColForm}>
+              <input
+                style={styles.sidebarInput}
+                placeholder="New collection..."
+                value={newColName}
+                onChange={e => setNewColName(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleCreateCollection()}
+              />
+              <button style={styles.sidebarBtn} onClick={handleCreateCollection}>+</button>
+            </div>
+
+            {/* Invite to collection */}
+            {collections.owned?.filter(c => c.is_shared).length > 0 && (
+              <div style={{ marginTop: 24 }}>
+                <p style={styles.sidebarLabel}>Invite to Collection</p>
+                <select
+                  style={styles.sidebarInput}
+                  onChange={e => setInviteColId(e.target.value)}
+                  defaultValue=""
+                >
+                  <option value="" disabled>Select collection</option>
+                  {collections.owned.filter(c => c.is_shared).map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+                <input
+                  style={{ ...styles.sidebarInput, marginTop: 6 }}
+                  placeholder="Friend's email..."
+                  value={inviteEmail}
+                  onChange={e => setInviteEmail(e.target.value)}
+                />
+                <button style={{ ...styles.sidebarBtn, width: "100%", marginTop: 6 }} onClick={handleInvite}>
+                  Invite
+                </button>
+              </div>
+            )}
+
+            {/* Share link (owned collections only) */}
+            {isOwned && (
+              <div style={{ marginTop: 24 }}>
+                <p style={styles.sidebarLabel}>Share Link</p>
+                {shareToken ? (
+                  <div>
+                    <button style={{ ...styles.sidebarBtn, width: "100%", marginBottom: 6, fontSize: 12 }} onClick={handleCopyShare}>
+                      {shareCopied ? "Copied!" : "Copy link"}
+                    </button>
+                    <button style={styles.revokeLinkBtn} onClick={handleRevokeShare}>Revoke</button>
+                  </div>
+                ) : (
+                  <button style={{ ...styles.sidebarBtn, width: "100%", fontSize: 12 }} onClick={handleGenerateShare}>
+                    Generate link
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Invite to collection */}
-          {collections.owned?.filter(c => c.is_shared).length > 0 && (
-            <div style={{ marginTop: 24 }}>
-              <p style={styles.sidebarLabel}>Invite to Collection</p>
-              <select
-                style={styles.sidebarInput}
-                onChange={e => setInviteColId(e.target.value)}
-                defaultValue=""
-              >
-                <option value="" disabled>Select collection</option>
-                {collections.owned.filter(c => c.is_shared).map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-              <input
-                style={{ ...styles.sidebarInput, marginTop: 6 }}
-                placeholder="Friend's email..."
-                value={inviteEmail}
-                onChange={e => setInviteEmail(e.target.value)}
-              />
-              <button style={{ ...styles.sidebarBtn, width: "100%", marginTop: 6 }} onClick={handleInvite}>
-                Invite
-              </button>
-            </div>
-          )}
-
-          {/* Share link (owned collections only) */}
-          {isOwned && (
-            <div style={{ marginTop: 24 }}>
-              <p style={styles.sidebarLabel}>Share Link</p>
-              {shareToken ? (
-                <div>
-                  <button style={{ ...styles.sidebarBtn, width: "100%", marginBottom: 6, fontSize: 12 }} onClick={handleCopyShare}>
-                    {shareCopied ? "Copied!" : "Copy link"}
-                  </button>
-                  <button style={styles.revokeLinkBtn} onClick={handleRevokeShare}>Revoke</button>
-                </div>
-              ) : (
-                <button style={{ ...styles.sidebarBtn, width: "100%", fontSize: 12 }} onClick={handleGenerateShare}>
-                  Generate link
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Bottom: Settings + Logout */}
+          {/* Pinned bottom: Settings + Logout */}
           <div style={styles.sidebarBottom}>
             <Link to="/settings" style={styles.sidebarBottomLink}>Settings</Link>
             <button style={styles.sidebarBottomBtn} onClick={handleLogout}>Logout</button>
@@ -617,10 +625,12 @@ const styles = {
   body:       { display: "flex", minHeight: "calc(100vh - 57px)" },
   sidebarBackdrop: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 199 },
   sidebar:    { width: 220, borderRight: "1px solid #2e2e30", padding: "24px 16px", background: "#161617", flexShrink: 0, display: "flex", flexDirection: "column" },
-  sidebarBottom: { marginTop: "auto", paddingTop: 16, borderTop: "1px solid #2e2e30", display: "flex", flexDirection: "column", gap: 6 },
+  sidebarHeader: { display: "flex", justifyContent: "flex-end", marginBottom: 8 },
+  sidebarScroll: { flex: 1, overflowY: "auto", minHeight: 0 },
+  sidebarBottom: { paddingTop: 16, borderTop: "1px solid #2e2e30", display: "flex", flexDirection: "column", gap: 6 },
   sidebarBottomLink: { color: "#8a8070", fontSize: 13, textDecoration: "none", padding: "8px 12px", borderRadius: 6, display: "block" },
   sidebarBottomBtn: { background: "transparent", border: "none", color: "#8a8070", cursor: "pointer", fontSize: 13, padding: "8px 12px", borderRadius: 6, textAlign: "left" },
-  sidebarClose: { background: "transparent", border: "none", color: "#8a8070", fontSize: 18, cursor: "pointer", float: "right", padding: "0 4px 8px" },
+  sidebarClose: { background: "transparent", border: "none", color: "#8a8070", fontSize: 18, cursor: "pointer", padding: "0 4px" },
   sidebarLabel: { fontFamily: "monospace", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#4a4640", marginBottom: 10, marginTop: 0 },
   collectionItem: { padding: "8px 12px", borderRadius: 6, cursor: "pointer", fontSize: 14, color: "#8a8070", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 },
   collectionActive: { background: "#2e2e30", color: "#f0ece3" },
