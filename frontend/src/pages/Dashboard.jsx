@@ -277,7 +277,7 @@ export default function Dashboard() {
           <span style={styles.logo}>WordVault</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <span style={styles.username}>Hi, {user.username}</span>
+          {!isMobile && <span style={styles.username}>Hi, {user.username}</span>}
           <Link to="/settings" style={styles.settingsLink}>Settings</Link>
           <button style={styles.logoutBtn} onClick={handleLogout}>Logout</button>
         </div>

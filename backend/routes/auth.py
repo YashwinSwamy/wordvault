@@ -295,7 +295,7 @@ def google_callback():
 
         return redirect(
             f"{FRONTEND_URL}/auth/callback"
-            f"?token={jwt_token}&user={user.id}&username={user.username}&email={user.email}"
+            f"?token={jwt_token}&user={user.id}&username={user.username}&email={user.email}&is_verified=true"
         )
 
     except Exception as e:
