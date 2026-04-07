@@ -34,7 +34,8 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    cors.init_app(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS")}})
+    # cors.init_app(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS")}})
+    cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
 
     # initialise OAuth
     oauth.init_app(app)
