@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [notes,            setNotes]            = useState("");
   const [loading,          setLoading]          = useState(false);
   const [error,            setError]            = useState("");
+  const [warning,          setWarning]          = useState("");
   const [newColName,       setNewColName]        = useState("");
   const [inviteEmail,      setInviteEmail]      = useState("");
   const [inviteColId,      setInviteColId]      = useState(null);
@@ -90,6 +91,7 @@ export default function Dashboard() {
     if (!word.trim()) return;
     setLoading(true);
     setError("");
+    setWarning("");
     try {
       const res = await addWord({ word, notes, collection_id: activeCollection.id });
       const newWord = res.data.word;
@@ -98,6 +100,9 @@ export default function Dashboard() {
       setTimeout(() => setNewlyAddedId(null), 400);
       setWord("");
       setNotes("");
+      if (res.data.definition_found === false) {
+        showWarning("Word added, but no definition was found. You can update it later.");
+      }
     } catch (err) {
       setError(err.response?.data?.error || "Could not add word");
     }
@@ -225,6 +230,11 @@ export default function Dashboard() {
   const showMessage = (msg) => {
     setMessage(msg);
     setTimeout(() => setMessage(""), 3000);
+  };
+
+  const showWarning = (msg) => {
+    setWarning(msg);
+    setTimeout(() => setWarning(""), 5000);
   };
 
   const handleResendVerify = async () => {
@@ -455,6 +465,7 @@ export default function Dashboard() {
 
           {/* Messages */}
           {error   && <p style={styles.error}>{error}</p>}
+          {warning && <p style={styles.warning}>{warning}</p>}
           {message && <p style={styles.success}>{message}</p>}
 
           {/* Flashcard mode */}
@@ -649,6 +660,7 @@ const styles = {
   addBtn:     { background: "#c9a96e", border: "none", borderRadius: 6, color: "#0e0e0f", cursor: "pointer", fontSize: 13, fontWeight: 600, padding: "10px 24px", whiteSpace: "nowrap" },
   searchInput: { background: "#1a1a1c", border: "1px solid #2e2e30", borderRadius: 6, color: "#f0ece3", fontSize: 13, padding: "9px 14px", outline: "none", width: "100%", boxSizing: "border-box", marginBottom: 16 },
   error:      { color: "#e07070", fontSize: 13, marginBottom: 12 },
+  warning:    { color: "#c9a96e", fontSize: 13, marginBottom: 12 },
   success:    { color: "#6ec97a", fontSize: 13, marginBottom: 12 },
   empty:      { color: "#3a3630", fontStyle: "italic", fontSize: 18, textAlign: "center", padding: "60px 0" },
   tableWrap:  { overflowX: "auto" },
