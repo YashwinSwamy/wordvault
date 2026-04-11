@@ -34,6 +34,7 @@ export default function Dashboard() {
   // inline edit
   const [editingId,        setEditingId]        = useState(null);
   const [editedNotes,      setEditedNotes]      = useState("");
+  const [editedDefinition, setEditedDefinition] = useState("");
 
   // flashcard
   const [flashcardMode,    setFlashcardMode]    = useState(false);
@@ -122,11 +123,11 @@ export default function Dashboard() {
   // ── Inline notes edit ─────────────────────────────────────────────────────────
   const handleEditNotes = async (word_id) => {
     try {
-      const res = await updateWord(word_id, { notes: editedNotes });
+      const res = await updateWord(word_id, { notes: editedNotes, definition: editedDefinition });
       setWords(prev => prev.map(w => w.id === word_id ? res.data.word : w));
       setEditingId(null);
     } catch {
-      setError("Could not update notes");
+      setError("Could not update word");
     }
   };
 
@@ -533,7 +534,23 @@ export default function Dashboard() {
                           {w.word}
                           {w.part_of_speech && <span style={{ ...styles.posBadge, marginLeft: 8 }}>{w.part_of_speech}</span>}
                         </div>
-                        <div style={styles.mobileDef}>{w.definition}</div>
+                        {editingId === w.id ? (
+                          <textarea
+                            style={{ ...styles.notesTextarea, marginTop: 6 }}
+                            value={editedDefinition}
+                            onChange={e => setEditedDefinition(e.target.value)}
+                            rows={2}
+                            placeholder="Enter definition..."
+                          />
+                        ) : (
+                          <div
+                            style={{ ...styles.mobileDef, cursor: "pointer" }}
+                            title="Click to edit definition"
+                            onClick={() => { setEditingId(w.id); setEditedNotes(w.notes || ""); setEditedDefinition(w.definition || ""); }}
+                          >
+                            {w.definition || <span style={{ color: "#3a3630" }}>✎ add definition</span>}
+                          </div>
+                        )}
                         {w.example && <div style={styles.mobileEx}>{w.example}</div>}
                         {editingId === w.id ? (
                           <div style={{ marginTop: 8 }}>
@@ -542,7 +559,7 @@ export default function Dashboard() {
                               value={editedNotes}
                               onChange={e => setEditedNotes(e.target.value)}
                               rows={2}
-                              autoFocus
+                              placeholder="Enter notes..."
                             />
                             <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                               <button style={styles.saveNotesBtn} onClick={() => handleEditNotes(w.id)}>Save</button>
@@ -579,7 +596,25 @@ export default function Dashboard() {
                         <td style={styles.td}>
                           <span style={styles.posBadge}>{w.part_of_speech}</span>
                         </td>
-                        <td style={styles.td}>{w.definition}</td>
+                        <td style={styles.td}>
+                          {editingId === w.id ? (
+                            <textarea
+                              style={styles.notesTextarea}
+                              value={editedDefinition}
+                              onChange={e => setEditedDefinition(e.target.value)}
+                              rows={2}
+                              placeholder="Enter definition..."
+                            />
+                          ) : (
+                            <span
+                              style={{ cursor: "pointer" }}
+                              title="Click to edit definition"
+                              onClick={() => { setEditingId(w.id); setEditedNotes(w.notes || ""); setEditedDefinition(w.definition || ""); }}
+                            >
+                              {w.definition || <span style={{ color: "#3a3630" }}>✎ add definition</span>}
+                            </span>
+                          )}
+                        </td>
                         <td style={{ ...styles.td, fontStyle: "italic", color: "#7a7062" }}>{w.example || "—"}</td>
                         <td style={{ ...styles.td, color: "#5a5650", minWidth: 140 }}>
                           {editingId === w.id ? (
@@ -589,7 +624,7 @@ export default function Dashboard() {
                                 value={editedNotes}
                                 onChange={e => setEditedNotes(e.target.value)}
                                 rows={2}
-                                autoFocus
+                                placeholder="Enter notes..."
                               />
                               <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
                                 <button style={styles.saveNotesBtn} onClick={() => handleEditNotes(w.id)}>Save</button>
@@ -600,7 +635,7 @@ export default function Dashboard() {
                             <span
                               style={{ cursor: "pointer" }}
                               title="Click to edit notes"
-                              onClick={() => { setEditingId(w.id); setEditedNotes(w.notes || ""); }}
+                              onClick={() => { setEditingId(w.id); setEditedNotes(w.notes || ""); setEditedDefinition(w.definition || ""); }}
                             >
                               {w.notes || <span style={{ color: "#3a3630" }}>✎ add note</span>}
                             </span>
