@@ -101,11 +101,21 @@ def add_word():
     if not ok:
         return jsonify({"error": result}), 403
 
-    # get definition from Claude
+    # check for duplicate in this collection
+    existing = Word.query.filter(
+        Word.collection_id == collection_id,
+        db.func.lower(Word.word) == data["word"].strip().lower()
+    ).first()
+    if existing:
+        return jsonify({"error": f'"{data["word"]}" is already in this collection.'}), 409
+
+    # get definition from the dictionary API; proceed without one if it fails
+    definition_found = True
     try:
         meaning = lookup_word(data["word"])
-    except Exception as e:
-        return jsonify({"error": f"Could not fetch definition: {str(e)}"}), 500
+    except Exception:
+        meaning = {}
+        definition_found = False
 
     # save the word
     word = Word(
@@ -120,7 +130,11 @@ def add_word():
     db.session.add(word)
     db.session.commit()
 
-    return jsonify({"message": "Word added", "word": word.to_dict()}), 201
+    return jsonify({
+        "message":          "Word added",
+        "word":             word.to_dict(),
+        "definition_found": definition_found,
+    }), 201
 
 
 # ── List words ────────────────────────────────────────────────────────────────
