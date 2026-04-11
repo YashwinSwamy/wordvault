@@ -395,6 +395,7 @@ export default function Dashboard() {
           <div style={styles.sidebarBottom}>
             <Link to="/settings" style={styles.sidebarBottomLink}>Settings</Link>
             <button style={styles.sidebarBottomBtn} onClick={handleLogout}>Logout</button>
+            <a href="mailto:getwordvault@gmail.com" style={styles.feedbackLink}>Feedback</a>
           </div>
         </div>
 
@@ -676,6 +677,7 @@ const styles = {
   sidebarBottom: { paddingTop: 16, borderTop: "1px solid #2e2e30", display: "flex", flexDirection: "column", gap: 6 },
   sidebarBottomLink: { color: "#8a8070", fontSize: 13, textDecoration: "none", padding: "8px 12px", borderRadius: 6, display: "block" },
   sidebarBottomBtn: { background: "transparent", border: "none", color: "#8a8070", cursor: "pointer", fontSize: 13, padding: "8px 12px", borderRadius: 6, textAlign: "left" },
+  feedbackLink: { color: "#5a5650", fontSize: 12, textDecoration: "none", padding: "6px 12px", display: "block" },
   sidebarClose: { background: "transparent", border: "none", color: "#8a8070", fontSize: 18, cursor: "pointer", padding: "0 4px" },
   sidebarLabel: { fontFamily: "monospace", fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "#4a4640", marginBottom: 10, marginTop: 0 },
   collectionItem: { padding: "8px 12px", borderRadius: 6, cursor: "pointer", fontSize: 14, color: "#8a8070", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2 },

@@ -170,6 +170,11 @@ export default function Settings() {
             </button>
           </form>
         </div>
+
+        <p style={s.feedback}>
+          Have feedback or need help?{" "}
+          <a href="mailto:getwordvault@gmail.com" style={s.feedbackLink}>getwordvault@gmail.com</a>
+        </p>
       </div>
     </div>
   );
@@ -192,4 +197,6 @@ const s = {
   error:     { color: "#e07070", fontSize: 12, margin: 0 },
   success:   { color: "#6ec97a", fontSize: 12, margin: 0 },
   muted:     { color: "#8a8070", fontSize: 14, lineHeight: 1.6, margin: 0 },
+  feedback:  { color: "#3a3630", fontSize: 13, marginTop: 24, textAlign: "center" },
+  feedbackLink: { color: "#5a5650", textDecoration: "none" },
 };

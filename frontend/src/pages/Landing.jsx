@@ -186,6 +186,8 @@ export default function Landing() {
       <footer style={s.footer}>
         <span style={s.footerText}>Built by Yashwin · </span>
         <Link to="/register" style={s.footerLink}>Open WordVault →</Link>
+        <span style={s.footerText}> · Feedback: </span>
+        <a href="mailto:getwordvault@gmail.com" style={s.footerLink}>getwordvault@gmail.com</a>
       </footer>
 
     </div>
