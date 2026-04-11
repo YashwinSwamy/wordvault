@@ -81,7 +81,10 @@ export default function Login() {
         <p style={styles.link}>
           Don't have an account? <Link to="/register">Register</Link>
         </p>
-        
+        <p style={styles.link}>
+          Need help? <a href="mailto:getwordvault@gmail.com" style={{ color: "#5a5650" }}>getwordvault@gmail.com</a>
+        </p>
+
       </div>
     </div>
   );
