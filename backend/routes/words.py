@@ -206,7 +206,8 @@ def update_word(word_id):
     if data is None:
         return jsonify({"error": "Request body required"}), 400
 
-    word.notes = data.get("notes", word.notes)
+    word.notes      = data.get("notes", word.notes)
+    word.definition = data.get("definition", word.definition)
     db.session.commit()
 
     return jsonify({"word": word.to_dict()}), 200
