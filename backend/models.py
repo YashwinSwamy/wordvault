@@ -22,6 +22,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=True) # nullable for OAuth users
     username      = db.Column(db.String(100), nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login    = db.Column(db.DateTime, nullable=True)
 
     # email verification
     is_verified  = db.Column(db.Boolean, default=False, nullable=False)
@@ -43,6 +44,8 @@ class User(db.Model):
             "email"       : self.email,
             "username"    : self.username,
             "is_verified" : self.is_verified,
+            "created_at"  : self.created_at.isoformat() if self.created_at else None,
+            "last_login"  : self.last_login.isoformat()  if self.last_login  else None,
         }
 
 

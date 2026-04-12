@@ -35,7 +35,12 @@ export default function Register() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.title}>WordVault</h1>
+        <div style={{ textAlign: "left", marginBottom: 8 }}>
+          <Link to="/" style={styles.homeLink}>← Home</Link>
+        </div>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <h1 style={styles.title}>WordVault</h1>
+        </Link>
         <p style={styles.subtitle}>Create your account</p>
 
         <form onSubmit={handleSubmit} style={styles.form}>
@@ -185,5 +190,10 @@ const styles = {
     fontSize: 13,
     textAlign: "center",
     marginTop: 20,
+  },
+  homeLink: {
+    color: "#8a8070",
+    fontSize: 12,
+    textDecoration: "none",
   },
 };

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation, Link } from "react-router-dom";
 import { login } from "../api";
 
 // const BACKEND_URL = "https://wordvault-backend-xl0w.onrender.com";
@@ -7,6 +7,7 @@ const BACKEND_URL = "https://api.wordvault.in";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const verified    = searchParams.get("verified") === "1";
   const resetDone   = searchParams.get("reset")    === "1";
@@ -24,7 +25,7 @@ export default function Login() {
       const res = await login(form);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/dashboard");
+      navigate(location.state?.from || "/dashboard");
     } catch (err) {
       setError(err.response?.data?.error || "Something went wrong");
     }
@@ -34,7 +35,12 @@ export default function Login() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.title}>WordVault</h1>
+        <div style={{ textAlign: "left", marginBottom: 8 }}>
+          <Link to="/" style={styles.homeLink}>← Home</Link>
+        </div>
+        <Link to="/" style={{ textDecoration: "none" }}>
+          <h1 style={styles.title}>WordVault</h1>
+        </Link>
         <p style={styles.subtitle}>Welcome back</p>
 
         {verified  && <p style={styles.success}>Email verified! You can now log in.</p>}
@@ -186,6 +192,11 @@ const styles = {
     marginTop: 20,
   },
   forgotLink: {
+    color: "#8a8070",
+    fontSize: 12,
+    textDecoration: "none",
+  },
+  homeLink: {
     color: "#8a8070",
     fontSize: 12,
     textDecoration: "none",
