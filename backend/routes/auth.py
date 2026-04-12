@@ -102,6 +102,9 @@ def login():
     if not bcrypt.check_password_hash(user.password_hash, data["password"]):
         return jsonify({"error": "Invalid email or password"}), 401
 
+    user.last_login = datetime.utcnow()
+    db.session.commit()
+
     token = create_access_token(identity=str(user.id))
 
     return jsonify({
@@ -289,6 +292,7 @@ def google_callback():
             if not user.is_verified:
                 user.is_verified = True
 
+        user.last_login = datetime.utcnow()
         db.session.commit()
 
         jwt_token = create_access_token(identity=str(user.id))

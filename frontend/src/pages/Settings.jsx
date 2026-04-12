@@ -81,7 +81,7 @@ export default function Settings() {
     <div style={s.page}>
       {/* Navbar */}
       <div style={s.navbar}>
-        <span style={s.logo}>WordVault</span>
+        <Link to="/" style={{ textDecoration: "none" }}><span style={s.logo}>WordVault</span></Link>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <Link to="/dashboard" style={s.backLink}>← Dashboard</Link>
           <span style={s.username}>{user.username}</span>
@@ -90,6 +90,27 @@ export default function Settings() {
 
       <div style={{ ...s.container, padding: isMobile ? "24px 16px" : "48px 6%" }}>
         <h1 style={s.pageTitle}>Account Settings</h1>
+
+        {/* ── Account Info ── */}
+        <div style={s.card}>
+          <h2 style={s.cardTitle}>Account Info</h2>
+          <div style={s.infoRow}>
+            <span style={s.infoLabel}>Member since</span>
+            <span style={s.infoValue}>
+              {user.created_at
+                ? new Date(user.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+                : "—"}
+            </span>
+          </div>
+          <div style={s.infoRow}>
+            <span style={s.infoLabel}>Last login</span>
+            <span style={s.infoValue}>
+              {user.last_login
+                ? new Date(user.last_login).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
+                : "—"}
+            </span>
+          </div>
+        </div>
 
         {/* ── Username ── */}
         <div style={s.card}>
@@ -199,4 +220,7 @@ const s = {
   muted:     { color: "#8a8070", fontSize: 14, lineHeight: 1.6, margin: 0 },
   feedback:  { color: "#3a3630", fontSize: 13, marginTop: 24, textAlign: "center" },
   feedbackLink: { color: "#5a5650", textDecoration: "none" },
+  infoRow:   { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #2e2e30" },
+  infoLabel: { color: "#8a8070", fontSize: 13 },
+  infoValue: { color: "#f0ece3", fontSize: 13 },
 };

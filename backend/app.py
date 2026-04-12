@@ -18,6 +18,7 @@ def _migrate_columns(app):
         "ALTER TABLE users       ADD COLUMN IF NOT EXISTS reset_token_expires TIMESTAMP",
         "ALTER TABLE collections ADD COLUMN IF NOT EXISTS share_token         VARCHAR(100)",
         "ALTER TABLE collections ADD COLUMN IF NOT EXISTS share_expires_at    TIMESTAMP",
+        "ALTER TABLE users       ADD COLUMN IF NOT EXISTS last_login          TIMESTAMP",
     ]
     with app.app_context():
         with db.engine.connect() as conn:

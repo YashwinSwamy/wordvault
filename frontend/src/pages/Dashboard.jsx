@@ -285,7 +285,7 @@ export default function Dashboard() {
       <div style={styles.navbar}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <button style={styles.hamburger} onClick={() => setSidebarOpen(o => !o)}>☰</button>
-          <span style={styles.logo}>WordVault</span>
+          <Link to="/" style={{ textDecoration: "none" }}><span style={styles.logo}>WordVault</span></Link>
         </div>
         {!isMobile && <span style={styles.username}>Hi, {user.username}</span>}
       </div>

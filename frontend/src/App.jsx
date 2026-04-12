@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Landing          from "./pages/Landing";
 import Login            from "./pages/Login";
@@ -16,10 +16,11 @@ function HomeRoute() {
   return token ? <Navigate to="/dashboard" /> : <Landing />;
 }
 
-// ProtectedRoute — redirects to /login if no token found
+// ProtectedRoute — redirects to /login if no token found, preserving the intended destination
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/login" />;
+  const location = useLocation();
+  return token ? children : <Navigate to="/login" state={{ from: location.pathname }} />;
 }
 
 export default function App() {
